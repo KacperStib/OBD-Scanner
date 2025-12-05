@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "spi_eeprom",
-    "project_version":    "1",
+    "project_version":    "da715b3-dirty",
     "project_path":       "/home/kacper/Espressif/workspace/dummyCANDevice",
     "idf_path":           "/home/kacper/Espressif/esp-idf/esp-idf-v5.5.1",
     "build_dir":          "/home/kacper/Espressif/workspace/dummyCANDevice/build",

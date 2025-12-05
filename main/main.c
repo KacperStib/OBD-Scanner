@@ -21,11 +21,16 @@ ESP32C3 and MCP2515 based
 #  define PIN_NUM_MOSI      12
 #  define PIN_NUM_CLK       11
 #  define PIN_NUM_CS        10
+#  define PIN_NUM_INTERRUPT 4
 
 static const char TAG[] = "main";
 
+// RX and TX frames
 CAN_FRAME_t can_frame_rx[1];
+CAN_FRAME can_frame_tx;
+
 uint16_t counter = 1;
+bool interrupt = false;
 
 bool SPI_Init(void)
 {
@@ -60,6 +65,7 @@ bool SPI_Init(void)
 	return true;
 }
 
+// Initialize CAN
 void CAN_init(void)
 {
 	MCP2515_init();
@@ -67,6 +73,45 @@ void CAN_init(void)
 	MCP2515_reset();
 	MCP2515_setBitrate(CAN_1000KBPS, MCP_8MHZ);
 	MCP2515_setNormalMode();
+}
+
+// Write on CANbus
+void CAN_write(void){
+	// Data
+	can_frame_rx[0]->data[0] = (counter >> 8) & 0xFF;  // MSB
+	can_frame_rx[0]->data[1] = counter & 0xFF;         // LSB
+				
+	// Send data
+	if(MCP2515_sendMessageAfterCtrlCheck(can_frame_rx[0]) != ERROR_OK) {
+		ESP_LOGE(TAG, "Couldn't send message.");
+	} 
+	else {
+		ESP_LOGI(TAG, "Sent CAN value: %d", counter);
+	}
+				
+	// Counter
+	counter++;
+	if(counter > 65535) counter = 1;
+}
+
+// Read from CANbus
+void CAN_read(void){
+	
+
+	if ((MCP2515_readMessage(RXB0, can_frame_tx) == ERROR_OK) ||
+		(MCP2515_readMessage(RXB1, can_frame_tx) == ERROR_OK)) {
+			printf("CAN ID: 0x%08lX\n", can_frame_tx->can_id);
+			printf("DLC: %d\n", can_frame_tx->can_dlc);
+			printf("Data: ");
+			for (int i = 0; i < can_frame_tx->can_dlc; i++) {
+			        printf("%02X ", can_frame_tx->data[i]);
+			}
+			printf("\n");
+	}
+	else {
+		printf("No message\n");
+	}
+	
 }
 
 void app_main(void)
@@ -80,21 +125,9 @@ void app_main(void)
 	can_frame_rx[0]->can_dlc = 2;  
 		
     while (1) {
-			// Data
-        	can_frame_rx[0]->data[0] = (counter >> 8) & 0xFF;  // MSB
-		    can_frame_rx[0]->data[1] = counter & 0xFF;         // LSB
 			
-			// Send data
-		    if(MCP2515_sendMessageAfterCtrlCheck(can_frame_rx[0]) != ERROR_OK) {
-		        ESP_LOGE(TAG, "Couldn't send message.");
-		    } else {
-		        ESP_LOGI(TAG, "Sent CAN value: %d", counter);
-		    }
-			
-			// Counter
-		    counter++;
-		    if(counter > 65535) counter = 1;
-			
+			CAN_write();
+			CAN_read();
 			// Delay
 		    vTaskDelay(pdMS_TO_TICKS(1000)); 
     }
