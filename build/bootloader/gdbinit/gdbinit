@@ -1,0 +1,2 @@
+source /home/kacper/Espressif/workspace/dummyCANDevice/build/bootloader/gdbinit/symbols
+source /home/kacper/Espressif/workspace/dummyCANDevice/build/bootloader/gdbinit/connect
