@@ -18,4 +18,4 @@ static const char TAG[] = "main";
 
 bool SPI_Init(void);
 void CAN_init(void);
-void CAN_read(void);
+void CAN_read(uint8_t *buf);

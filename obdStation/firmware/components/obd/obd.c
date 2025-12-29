@@ -59,7 +59,7 @@ void CAN_init(void)
 }
 
 // Read from CANbus
-void CAN_read(void){
+void CAN_read(uint8_t *buf){
 	CAN_FRAME_t can_frame_rx[1];
 
 	if ((MCP2515_readMessage(RXB0, can_frame_rx[0]) == ERROR_OK) ||
@@ -69,6 +69,7 @@ void CAN_read(void){
 			printf("Data: ");
 			for (int i = 0; i < can_frame_rx[0]->can_dlc; i++) {
 			        printf("%02X ", can_frame_rx[0]->data[i]);
+			        buf[i] = can_frame_rx[0]->data[i];
 			}
 			printf("\n");
 	}
