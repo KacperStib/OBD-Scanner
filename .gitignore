@@ -1,1 +1,9 @@
 /report/LaTeX
+/obdStation/firmware/build
+/screenStation/firmware/build
+# Binaries
+*.bin
+*.elf
+*.map
+*.hex
+*.uf2
