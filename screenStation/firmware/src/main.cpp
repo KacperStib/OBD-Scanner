@@ -1,5 +1,6 @@
 #include "ble.h"
 #include "screen.h"
+#include "clock.h"
 
 std::string val;
 
@@ -11,6 +12,41 @@ String toHex(const std::string& s) {
         out += " ";
     }
     return out;
+}
+
+void lvglAndCmdsTask(void *pvParameters){
+  for(;;){
+    lv_timer_handler();
+    vTaskDelay(20 / portTICK_PERIOD_MS);
+  } 
+}
+
+void bleTask(void *pvParameters){
+  for(;;){
+    if (doConnect) {
+        if (connectToServer()) {
+            Serial.println("Connected and ready to read");
+        }
+        doConnect = false;
+    }
+
+    if (connected && pRemoteCharacteristic && pRemoteCharacteristic->canRead()) {
+        val = pRemoteCharacteristic->readValue();
+        Serial.print("Characteristic value: ");
+        for (auto c : val) Serial.printf("%02X ", (uint8_t)c);
+        Serial.println();
+    }
+    
+    vTaskDelay(2000 / portTICK_PERIOD_MS); // odczyt co 2 sekundy
+  }
+}
+
+void timeTask(void *pvParameters){
+    setRTC();
+    for(;;){
+        printTime();
+         vTaskDelay(1000 / portTICK_PERIOD_MS); 
+    }
 }
 
 // --- Setup ---
@@ -26,28 +62,19 @@ void setup() {
     pScan->setActiveScan(true);
     pScan->start(0, false); // skanowanie w tle
 
-    tft_init();
+    // inicjalizacja wyswietlacza
+    init_tft();
+    init_lvgl();
+
+    // Taski
+    // lvgl task - 20 ms
+    xTaskCreate(lvglAndCmdsTask, "lvglAndCmdsTask", 4096, NULL, 1, NULL);
+    // ble task - 2 s
+    xTaskCreate(bleTask, "bleTask", 4096, NULL, 2, NULL);
+    // time update task - 1 s
+    xTaskCreate(timeTask, "timeTask", 4096, NULL, 3, NULL);
 }
 
 // --- Loop ---
 void loop() {
-    if (doConnect) {
-        if (connectToServer()) {
-            Serial.println("Connected and ready to read");
-        }
-        doConnect = false;
-    }
-
-    if (connected && pRemoteCharacteristic && pRemoteCharacteristic->canRead()) {
-        val = pRemoteCharacteristic->readValue();
-        Serial.print("Characteristic value: ");
-        for (auto c : val) Serial.printf("%02X ", (uint8_t)c);
-        Serial.println();
-    }
-
-    tft.setCursor(0, 0);
-    tft.setTextColor(TFT_WHITE,TFT_BLACK);  tft.setTextSize(1);
-    tft.println(toHex(val));
-    
-    delay(2000); // odczyt co 2 sekundy
 }

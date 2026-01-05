@@ -1,6 +1,7 @@
 /report/LaTeX
 /obdStation/firmware/build
 /screenStation/firmware/.pio
+/screenStation/firmware/lib
 # Binaries
 *.bin
 *.elf
