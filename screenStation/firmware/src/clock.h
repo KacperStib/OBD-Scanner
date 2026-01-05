@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <Bonezegei_DS1307.h>
+#include <MCP7940.h>
 #include "CompileTime.h"  
 #include "screen.h"
 
@@ -11,7 +11,7 @@
 #define DS1307_12H_FORMAT 0x40
 #define DS1307_24H_FORMAT 0x3F
 
-extern Bonezegei_DS1307 rtc;
+extern MCP7940_Class MCP7940;
 extern char buf[50];
 extern uint8_t lastMin;
 extern bool i2cFlag;
