@@ -2,20 +2,14 @@
 
 TFT_eSPI tft = TFT_eSPI();
 
+char text_buf[50];
+
 // wymiary ekranu
 static const uint16_t screenWidth  = 320;
 static const uint16_t screenHeight = 240;
 // bufory
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t buf[ screenWidth * screenHeight / 10 ];
-
-// void tft_init(){
-//     tft.init();
-//     tft.setRotation(2);
-//     pinMode(14, OUTPUT);
-//     digitalWrite(14,1);
-//     tft.fillScreen(TFT_GREY);
-// }
 
 // odswiezanie ekranu
 void my_disp_flush( lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p )
@@ -88,4 +82,9 @@ void init_tft(){
   // dane kalibracyjne dla wyswietlacza 480x320
   uint16_t calData[5] = {406, 3326, 487, 3169, 1}; //{ 275, 3620, 264, 3532, 1 };
   tft.setTouch( calData );
+}
+
+void refresh_parameters(){
+    sprintf(text_buf, "%d km/h", 200);
+    lv_label_set_text(ui_Speed, text_buf);
 }

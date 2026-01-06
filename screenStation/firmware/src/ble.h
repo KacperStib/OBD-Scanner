@@ -16,9 +16,12 @@ extern BLERemoteCharacteristic* pRemoteCharacteristic;
 
 extern bool doConnect;
 extern bool connected;
+extern std::string val;
 
+void ble_init();
 static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify);
 bool connectToServer();
+void ble_check_connection();
 
 // --- Klasy callbacków ---
 // --- Callback klienta ---

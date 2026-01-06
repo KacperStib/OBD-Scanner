@@ -18,7 +18,10 @@ ESP32C3 and MCP2515 based
 #include "ble.h"
 
 //static const char TAG[] = "main";
-uint8_t can_buf[8] = {0};
+// 1 byte - velocity, 2 byte - RPM, 2 byte - MAF
+uint8_t can_buf[5] = {0};
+uint16_t test_RPM = 1800;
+uint16_t test_MAF = 1000;
 
 void obd_task(){
 	CAN_init();
@@ -32,10 +35,16 @@ void obd_task(){
 void ble_task(){
 	ble_init();
 	for(;;){
-		for(int i = 0 ; i < 8 ; i++){
+		ble_buf[0] = can_buf[0] * 256 + can_buf[1];
+		ble_buf[1] = (test_RPM >> 8) & 0xFF;
+		ble_buf[2] = test_RPM & 0xFF;
+		ble_buf[3] = (test_MAF) >> 8 & 0xFF;
+		ble_buf[4] = test_MAF & 0xFF;
+		// full buf
+		/*for(int i = 0 ; i < 8 ; i++){
 			ble_buf[i] = can_buf[i];
-		}
-	vTaskDelay(pdMS_TO_TICKS(1000)); 
+		}*/
+		vTaskDelay(pdMS_TO_TICKS(1000)); 
 	}
 }
 
