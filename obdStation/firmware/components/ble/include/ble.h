@@ -13,7 +13,7 @@
 #include "services/gatt/ble_svc_gatt.h"
 #include "sdkconfig.h"
 
-extern uint8_t ble_buf[8];
+extern uint8_t ble_buf[5];
 
 extern uint8_t ble_addr_type;
 static int device_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg);

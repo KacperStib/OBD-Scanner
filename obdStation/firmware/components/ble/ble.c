@@ -2,7 +2,7 @@
 
 uint8_t ble_addr_type;
 
-uint8_t ble_buf[8] = {0};
+uint8_t ble_buf[5] = {0};
 
 // Write data to ESP32 defined as server
 static int device_write(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt *ctxt, void *arg)

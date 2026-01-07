@@ -1,3 +1,4 @@
+#pragma once
 #include <Arduino.h>
 #include <BLEDevice.h>
 #include <BLEUtils.h>
@@ -17,6 +18,7 @@ extern BLERemoteCharacteristic* pRemoteCharacteristic;
 extern bool doConnect;
 extern bool connected;
 extern std::string val;
+extern uint8_t ble_buf[5];
 
 void ble_init();
 static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify);

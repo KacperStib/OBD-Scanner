@@ -85,6 +85,18 @@ void init_tft(){
 }
 
 void refresh_parameters(){
-    sprintf(text_buf, "%d km/h", 200);
+    sprintf(text_buf, "%d km/h", speed);
     lv_label_set_text(ui_Speed, text_buf);
+
+    sprintf(text_buf, "%.2f l/100km", fuel_consumption);
+    lv_label_set_text(ui_Consump, text_buf);
+
+    sprintf(text_buf, "%.2f l/100km", fuel_consumption_avg);
+    lv_label_set_text(ui_ConsumpAvg, text_buf);
+
+    sprintf(text_buf, "%.2f km", distance);
+    lv_label_set_text(ui_Distance, text_buf);
+
+    sprintf(text_buf, "%.2f l", fuel);
+    lv_label_set_text(ui_Fuel, text_buf);
 }

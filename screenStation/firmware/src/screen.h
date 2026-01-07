@@ -4,6 +4,8 @@
 #include <lvgl.h>
 #include "ui/ui.h"
 
+#include "parameters.h"
+
 #define TFT_GREY 0x5AEB 
 
 extern TFT_eSPI tft;

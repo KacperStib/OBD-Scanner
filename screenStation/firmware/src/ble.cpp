@@ -8,6 +8,7 @@ BLERemoteCharacteristic* pRemoteCharacteristic = nullptr;
 bool doConnect = false;
 bool connected = false;
 std::string val;
+uint8_t ble_buf[5] = {0};
 
 void ble_init(){
     Serial.println("Starting BLE Client");
@@ -86,7 +87,14 @@ void ble_check_connection(){
     if (connected && pRemoteCharacteristic && pRemoteCharacteristic->canRead()) {
         val = pRemoteCharacteristic->readValue();
         Serial.print("Characteristic value: ");
-        for (auto c : val) Serial.printf("%02X ", (uint8_t)c);
-        Serial.println();
+        //for (auto c : val) Serial.printf("%02X ", (uint8_t)c);
+        //Serial.println();
+
+        // ble buf
+        for (int i = 0; i < 5; i++) {
+            ble_buf[i] = (uint8_t)val[i];
+            Serial.println(ble_buf[i]);
+        }
+       
     }
 }

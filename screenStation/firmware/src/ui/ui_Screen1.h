@@ -14,6 +14,7 @@ extern "C" {
 extern void ui_Screen1_screen_init(void);
 extern void ui_Screen1_screen_destroy(void);
 extern lv_obj_t * ui_Screen1;
+extern void ui_event_ResetBtn(lv_event_t * e);
 extern lv_obj_t * ui_ResetBtn;
 extern lv_obj_t * ui_Speed;
 extern lv_obj_t * ui_ConsumpAvg;
@@ -24,6 +25,7 @@ extern lv_obj_t * ui_Consump;
 extern lv_obj_t * ui_Date;
 extern lv_obj_t * ui_Reset;
 // CUSTOM VARIABLES
+extern bool reset;
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -21,7 +21,7 @@ ESP32C3 and MCP2515 based
 // 1 byte - velocity, 2 byte - RPM, 2 byte - MAF
 uint8_t can_buf[5] = {0};
 uint16_t test_RPM = 1800;
-uint16_t test_MAF = 1000;
+uint16_t test_MAF = 50;
 
 void obd_task(){
 	CAN_init();
