@@ -16,6 +16,14 @@ lv_obj_t * ui_Consump = NULL;
 lv_obj_t * ui_Date = NULL;
 lv_obj_t * ui_Reset = NULL;
 // event funtions
+void ui_event_ResetBtn(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        clicked_rst(e);
+    }
+}
 
 // build funtions
 
@@ -27,7 +35,7 @@ void ui_Screen1_screen_init(void)
     ui_ResetBtn = lv_btn_create(ui_Screen1);
     lv_obj_set_width(ui_ResetBtn, 75);
     lv_obj_set_height(ui_ResetBtn, 40);
-    lv_obj_set_x(ui_ResetBtn, 100);
+    lv_obj_set_x(ui_ResetBtn, 0);
     lv_obj_set_y(ui_ResetBtn, 85);
     lv_obj_set_align(ui_ResetBtn, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_ResetBtn, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
@@ -37,7 +45,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_width(ui_Speed, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Speed, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_Speed, 0);
-    lv_obj_set_y(ui_Speed, -15);
+    lv_obj_set_y(ui_Speed, -30);
     lv_obj_set_align(ui_Speed, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Speed, "0 km/h");
     lv_obj_set_style_text_font(ui_Speed, &lv_font_montserrat_34, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -53,8 +61,8 @@ void ui_Screen1_screen_init(void)
     ui_Distance = lv_label_create(ui_Screen1);
     lv_obj_set_width(ui_Distance, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Distance, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Distance, 100);
-    lv_obj_set_y(ui_Distance, 20);
+    lv_obj_set_x(ui_Distance, 0);
+    lv_obj_set_y(ui_Distance, 50);
     lv_obj_set_align(ui_Distance, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Distance, "0 km");
 
@@ -65,7 +73,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_y(ui_Time, -90);
     lv_obj_set_align(ui_Time, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Time, "12:34");
-    lv_obj_set_style_text_font(ui_Time, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_Time, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Fuel = lv_label_create(ui_Screen1);
     lv_obj_set_width(ui_Fuel, LV_SIZE_CONTENT);   /// 1
@@ -78,10 +86,9 @@ void ui_Screen1_screen_init(void)
     ui_Consump = lv_label_create(ui_Screen1);
     lv_obj_set_width(ui_Consump, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Consump, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Consump, -100);
-    lv_obj_set_y(ui_Consump, 20);
     lv_obj_set_align(ui_Consump, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Consump, "0 l/100km");
+    lv_obj_set_style_text_font(ui_Consump, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Date = lv_label_create(ui_Screen1);
     lv_obj_set_width(ui_Date, LV_SIZE_CONTENT);   /// 1
@@ -94,10 +101,12 @@ void ui_Screen1_screen_init(void)
     ui_Reset = lv_label_create(ui_Screen1);
     lv_obj_set_width(ui_Reset, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Reset, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Reset, 100);
+    lv_obj_set_x(ui_Reset, 0);
     lv_obj_set_y(ui_Reset, 85);
     lv_obj_set_align(ui_Reset, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Reset, "Reset");
+
+    lv_obj_add_event_cb(ui_ResetBtn, ui_event_ResetBtn, LV_EVENT_ALL, NULL);
 
 }
 
