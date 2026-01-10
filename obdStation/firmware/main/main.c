@@ -1,6 +1,8 @@
 /*
-Dummy CAN BUS Device
-ESP32C3 and MCP2515 based
+ * main.c
+ *
+ *  Created on: 29 gru 2025
+ *       Author: Kacper Stiborski
 */
 
 #include <stdio.h>
@@ -23,14 +25,29 @@ uint8_t can_buf[5] = {0};
 uint16_t test_RPM = 1800;
 uint16_t test_MAF = 50;
 
+bool mozna = true;
+
 void obd_task(){
 	CAN_init();
-	vTaskDelay(pdMS_TO_TICKS(1000)); 
+	vTaskDelay(pdMS_TO_TICKS(5000)); 
+	OBD_write(0x01, PIDS_SUPPORT);
+	vTaskDelay(pdMS_TO_TICKS(100));
+	uint8_t buf[8];
 	for(;;){
-		//CAN_read(can_buf);
-		
-		OBD_supported_pids();
-		// Delay
+		if(mozna){
+			printf("WYSYLKA\n");
+			mozna = false;
+			OBD_write(0x01, ENGINE_RPM);
+			OBD_read(buf);
+			vTaskDelay(pdMS_TO_TICKS(100)); 
+			OBD_write(0x01, VEHICLE_SPEED);
+			OBD_read(buf);
+			vTaskDelay(pdMS_TO_TICKS(100)); 
+			OBD_write(0x01, MAF_AIR_FLOW_RATE);
+			OBD_read(buf);
+			mozna = true;
+		}
+		// Delay;
 		vTaskDelay(pdMS_TO_TICKS(1000)); 
 	}
 }

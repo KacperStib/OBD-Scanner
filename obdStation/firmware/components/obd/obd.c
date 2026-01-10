@@ -23,9 +23,9 @@ bool SPI_Init(void)
 	// Define MCP2515 SPI device configuration
 	spi_device_interface_config_t dev_cfg = {
 		.mode = 0, // (0,0)
-		.clock_speed_hz = 10000000, // 10mhz
+		.clock_speed_hz =4000000, // 4mhz
 		.spics_io_num = PIN_NUM_CS,
-		.queue_size = 128
+		.queue_size = 256
 	};
 
 	// Initialize SPI bus
@@ -54,12 +54,36 @@ void CAN_init(void)
 	}
 	SPI_Init();
 	MCP2515_reset();
+	vTaskDelay(pdMS_TO_TICKS(10));
 	MCP2515_setBitrate(CAN_500KBPS, MCP_8MHZ);
-	MCP2515_setNormalMode();
+	vTaskDelay(pdMS_TO_TICKS(10));
+	// MASK0 → filtry RXF0, RXF1 (Extended = false bo standard)
+    MCP2515_setFilterMask(MASK0, false, 0x7F0);  // maska 11-bitowa standard ID
+    MCP2515_setFilter(RXF0, false, 0x7DF);       // filter 0 → functional request
+    MCP2515_setFilter(RXF1, false, 0x7E1);       // filter 1 → ECU response (np 0x7E8 w decimal = 2016 → 0x7E0 + 8 = 0x7E8)
+
+    // MASK1 → filtry RXF2-RXF5
+    MCP2515_setFilterMask(MASK1, false, 0x7F0);
+    MCP2515_setFilter(RXF2, false, 0x7DF);
+    MCP2515_setFilter(RXF3, false, 0x7E1);
+    MCP2515_setFilter(RXF4, false, 0x7DF);
+    MCP2515_setFilter(RXF5, false, 0x7E1);
+    
+    MCP2515_setNormalMode();
+    // Interrupt pin
+    gpio_config_t io_conf = {
+        .pin_bit_mask = 1ULL << PIN_NUM_INTERRUPT,
+        .mode = GPIO_MODE_INPUT,
+        .pull_up_en = GPIO_PULLUP_ENABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE
+    };
+    gpio_config(&io_conf);
 }
 
 // Read from CANbus
-void CAN_read(uint8_t *buf){
+void CAN_read(uint8_t *buf)
+{
 	CAN_FRAME_t can_frame_rx[1];
 
 	if ((MCP2515_readMessage(RXB0, can_frame_rx[0]) == ERROR_OK) ||
@@ -79,7 +103,8 @@ void CAN_read(uint8_t *buf){
 	
 }
 
-void CAN_write(uint16_t val){
+void CAN_write(uint16_t val)
+{
 	CAN_FRAME_t can_frame_tx[1];
 	// ID and DLC
 	can_frame_tx[0]->can_id = (0x123) | CAN_EFF_FLAG; 
@@ -107,47 +132,55 @@ void OBD_write(uint8_t mode, uint8_t pid)
     frame[0]->data[0] = 0x02;    // ilość bajtów
     frame[0]->data[1] = mode;    // 0x01
     frame[0]->data[2] = pid;     // np. 0x0C
-    frame[0]->data[3] = 0x00;
-    frame[0]->data[4] = 0x00;
-    frame[0]->data[5] = 0x00;
-    frame[0]->data[6] = 0x00;
-    frame[0]->data[7] = 0x00;
+    frame[0]->data[3] = 0x55;
+    frame[0]->data[4] = 0x55;
+    frame[0]->data[5] = 0x55;
+    frame[0]->data[6] = 0x55;
+    frame[0]->data[7] = 0x55;
 
     if (MCP2515_sendMessageAfterCtrlCheck(frame[0]) != ERROR_OK)
         ESP_LOGE(TAG, "OBD send failed");
 }
 
 bool OBD_read(uint8_t *buf)
-{
+{	
     CAN_FRAME_t frame[1];
 	
-	if (MCP2515_readMessage(RXB0, frame[0]) != ERROR_OK &&
-    	MCP2515_readMessage(RXB1, frame[0]) != ERROR_OK)
-    	return false;
-    	
-	printf("CAN ID: 0x%08lX\n", frame[0]->can_id);
-	printf("DLC: %d\n", frame[0]->can_dlc);
-	printf("Data: ");
-			for (int i = 0; i < frame[0]->can_dlc; i++) {
-			        printf("%02X ", frame[0]->data[i]);
-			        buf[i] = frame[0]->data[i];
-			}
-	printf("\n");
-	
-    if (frame[0]->can_id != 0x7E8)
-        return false;
-	
-    //memcpy(buf, frame[0]->data, 8);
-    for (int i = 0; i < frame[0]->can_dlc; i++) {
-			        printf("%02X ", frame[0]->data[i]);
-			        buf[i] = frame[0]->data[i];
+	if(!gpio_get_level(PIN_NUM_INTERRUPT))
+	{
+		if (CANINTF_RX0IF){
+			if (MCP2515_readMessage(RXB0, frame[0]) != ERROR_OK)
+	    		return false;
+	    		}
+	   	else if (CANINTF_RX1IF){
+			if (MCP2515_readMessage(RXB1, frame[0]) != ERROR_OK)
+	    		return false;
+	    	}
+		printf("CAN ID: 0x%08lX\n", frame[0]->can_id);
+		printf("DLC: %d\n", frame[0]->can_dlc);
+		printf("Data: ");
+				for (int i = 0; i < frame[0]->can_dlc; i++) {
+				        printf("%02X ", frame[0]->data[i]);
+				        buf[i] = frame[0]->data[i];
+				}
+		printf("\n");
+		
+	    if (frame[0]->can_id != 0x7E8)
+	        return false;
+		
+	    //memcpy(buf, frame[0]->data, 8);
+	    for (int i = 0; i < frame[0]->can_dlc; i++) {
+				        printf("%02X ", frame[0]->data[i]);
+				        buf[i] = frame[0]->data[i];
+		}
+	    return true;
 	}
-    return true;
+	return false;
 }
 
 void OBD_supported_pids() 
 {
-	OBD_write(1, 0);
+	OBD_write(1, PIDS_SUPPORT);
 	vTaskDelay(pdMS_TO_TICKS(50));
 	
 	uint8_t buf[8];
@@ -171,4 +204,20 @@ void OBD_supported_pids()
             ESP_LOGI(TAG, "PID 0x%02X supported", pid);
         }
     }
+}
+
+void OBD_velocity()
+{
+	OBD_write(1, VEHICLE_SPEED);
+	vTaskDelay(pdMS_TO_TICKS(50));
+	
+	uint8_t buf[8];
+	if (!OBD_read(buf))
+		ESP_LOGE(TAG, "BAD MSG!");
+	
+	if (buf[1] != 0x41 || buf[2] != VEHICLE_SPEED){
+		ESP_LOGE(TAG, "BAD HEADER");
+        return;
+     }
+
 }
