@@ -79,4 +79,96 @@ void CAN_read(uint8_t *buf){
 	
 }
 
+void CAN_write(uint16_t val){
+	CAN_FRAME_t can_frame_tx[1];
+	// ID and DLC
+	can_frame_tx[0]->can_id = (0x123) | CAN_EFF_FLAG; 
+	can_frame_tx[0]->can_dlc = sizeof(val); 
+	// Data
+	can_frame_tx[0]->data[0] = (val >> 8) & 0xFF;  // MSB
+	can_frame_tx[0]->data[1] = val & 0xFF;         // LSB
+				
+	// Send data
+	if(MCP2515_sendMessageAfterCtrlCheck(can_frame_tx[0]) != ERROR_OK) {
+		ESP_LOGE(TAG, "Couldn't send message.");
+	} 
+	else {
+		ESP_LOGI(TAG, "Sent CAN value: %d", val);
+	}
+}
 
+void OBD_write(uint8_t mode, uint8_t pid)
+{
+    CAN_FRAME_t frame[1];
+
+    frame[0]->can_id  = 0x7DF;   // OBD2 broadcast
+    frame[0]->can_dlc = 8;
+
+    frame[0]->data[0] = 0x02;    // ilość bajtów
+    frame[0]->data[1] = mode;    // 0x01
+    frame[0]->data[2] = pid;     // np. 0x0C
+    frame[0]->data[3] = 0x00;
+    frame[0]->data[4] = 0x00;
+    frame[0]->data[5] = 0x00;
+    frame[0]->data[6] = 0x00;
+    frame[0]->data[7] = 0x00;
+
+    if (MCP2515_sendMessageAfterCtrlCheck(frame[0]) != ERROR_OK)
+        ESP_LOGE(TAG, "OBD send failed");
+}
+
+bool OBD_read(uint8_t *buf)
+{
+    CAN_FRAME_t frame[1];
+	
+	if (MCP2515_readMessage(RXB0, frame[0]) != ERROR_OK &&
+    	MCP2515_readMessage(RXB1, frame[0]) != ERROR_OK)
+    	return false;
+    	
+	printf("CAN ID: 0x%08lX\n", frame[0]->can_id);
+	printf("DLC: %d\n", frame[0]->can_dlc);
+	printf("Data: ");
+			for (int i = 0; i < frame[0]->can_dlc; i++) {
+			        printf("%02X ", frame[0]->data[i]);
+			        buf[i] = frame[0]->data[i];
+			}
+	printf("\n");
+	
+    if (frame[0]->can_id != 0x7E8)
+        return false;
+	
+    //memcpy(buf, frame[0]->data, 8);
+    for (int i = 0; i < frame[0]->can_dlc; i++) {
+			        printf("%02X ", frame[0]->data[i]);
+			        buf[i] = frame[0]->data[i];
+	}
+    return true;
+}
+
+void OBD_supported_pids() 
+{
+	OBD_write(1, 0);
+	vTaskDelay(pdMS_TO_TICKS(50));
+	
+	uint8_t buf[8];
+	if (!OBD_read(buf))
+		ESP_LOGE(TAG, "BAD MSG!");
+	
+	if (buf[1] != 0x41 || buf[2] != 0x00){
+		ESP_LOGE(TAG, "BAD HEADER");
+        return;
+       }
+	uint32_t bitmap =
+        (buf[3] << 24) |
+        (buf[4] << 16) |
+        (buf[5] << 8)  |
+        (buf[6]);
+
+    //ESP_LOGI(TAG, "PID bitmap: 0x%08X", bitmap);
+
+    for (uint8_t pid = 1; pid <= 32; pid++) {
+        if (bitmap & (1UL << (32 - pid))) {
+            ESP_LOGI(TAG, "PID 0x%02X supported", pid);
+        }
+    }
+}

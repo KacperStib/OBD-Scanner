@@ -6,6 +6,7 @@
  */
 #include "mcp2515.h"
 #include "esp_log.h"
+#include <string.h>
 
 static const char TAG[] = "main";
 
@@ -19,3 +20,8 @@ static const char TAG[] = "main";
 bool SPI_Init(void);
 void CAN_init(void);
 void CAN_read(uint8_t *buf);
+void CAN_write(uint16_t val);
+
+void OBD_write(uint8_t mode, uint8_t pid);
+bool OBD_read(uint8_t *buf);
+void OBD_supported_pids();
