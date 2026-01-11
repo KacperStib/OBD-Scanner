@@ -1,3 +1,10 @@
+/*
+ *   ble.c
+ *
+ *  Created on: 29 gru 2025
+ *       Author: Kacper Stiborski
+*/
+
 #include "ble.h"
 
 uint8_t ble_addr_type;

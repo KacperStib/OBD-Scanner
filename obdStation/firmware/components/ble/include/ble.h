@@ -1,3 +1,9 @@
+/*
+ *   ble.h
+ *
+ *  Created on: 29 gru 2025
+ *       Author: Kacper Stiborski
+*/
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
