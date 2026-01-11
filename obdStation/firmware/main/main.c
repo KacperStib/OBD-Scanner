@@ -96,6 +96,10 @@ void led_task()
 			gpio_set_level(PIN_LED, 0);
 			vTaskDelay(pdMS_TO_TICKS(500));
 		}
+		else
+		{
+			vTaskDelay(pdMS_TO_TICKS(1000));
+		}
 	}
 }
 
