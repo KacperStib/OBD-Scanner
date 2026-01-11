@@ -18,6 +18,8 @@ static const char TAG[] = "main";
 #  define PIN_NUM_CS        7
 #  define PIN_NUM_INTERRUPT GPIO_NUM_3
 
+#define PIN_LED GPIO_NUM_10
+
 // Modes
 #define CURRENT_DATA 0x01
 
@@ -37,10 +39,10 @@ void CAN_write(uint16_t val);
 
 void OBD_write(uint8_t mode, uint8_t pid);
 bool OBD_read(uint8_t *buf);
-void OBD_supported_pids();
+bool OBD_supported_pids();
 uint8_t OBD_velocity();
 uint16_t OBD_RPM();
 bool OBD_is_MAF_supported();
-uint16_t OBD_MAF();
+uint16_t OBD_MAF(bool maf_ok);
 int8_t OBD_IAT();
 uint8_t OBD_MAP();

@@ -88,6 +88,17 @@ void CAN_init(void)
         .intr_type = GPIO_INTR_DISABLE
     };
     gpio_config(&io_conf);
+    
+    // LED pin
+    gpio_config_t led_conf = {
+        .pin_bit_mask = 1ULL << PIN_LED,
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE
+    };
+    gpio_config(&led_conf);
+    gpio_set_level(PIN_LED, 0); // LED off
 }
 
 // Simple read from CANbus to buf 
@@ -222,7 +233,7 @@ bool OBD_read_with_check(uint8_t *buf, uint8_t pid)
 }
 
 // Display supported pids
-void OBD_supported_pids() 
+bool OBD_supported_pids() 
 {	
 	// Ask ECU about PIDs
 	OBD_write(CURRENT_DATA, PIDS_SUPPORT);
@@ -233,7 +244,7 @@ void OBD_supported_pids()
 	if (!OBD_read_with_check(buf, PIDS_SUPPORT))
 	{
 		ESP_LOGE(TAG, "Timeout no header");
-		return;
+		return false;
 	}
 	    
     // Bitmap of supported PIDs
@@ -251,6 +262,8 @@ void OBD_supported_pids()
             ESP_LOGI(TAG, "PID 0x%02X supported", pid);
         }
     }
+    
+    return true;
 }
 
 // Read vehilce velocity
@@ -330,12 +343,12 @@ bool OBD_is_MAF_supported()
 }
 
 // Read MAF
-uint16_t OBD_MAF()
+uint16_t OBD_MAF(bool maf_ok)
 {	
 	uint16_t MAF = 0;
 	
 	// Standard procedure read from MAF register
-	if (OBD_is_MAF_supported())
+	if (maf_ok)
 	{
 		// Ask ECU about MAF
 		OBD_write(CURRENT_DATA, MAF_AIR_FLOW_RATE);
