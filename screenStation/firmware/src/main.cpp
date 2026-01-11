@@ -3,25 +3,27 @@
 #include "clock.h"
 #include "parameters.h"
 
-void lvglTask(void *pvParameters){
-
+// LVGL - screen library task
+void lvglTask(void *pvParameters)
+{
   for(;;){
     lv_timer_handler();
     vTaskDelay(20 / portTICK_PERIOD_MS);
   } 
 }
 
-void bleTask(void *pvParameters){
-
+// BLE - task check connection and receive BLE data
+void bleTask(void *pvParameters)
+{
   for(;;){
     ble_check_connection();
-    
     vTaskDelay(2000 / portTICK_PERIOD_MS); 
   }
 }
 
-void timeTask(void *pvParameters){
-
+// Check time from RTC
+void timeTask(void *pvParameters)
+{
     setRTC();
     for(;;){
       printTime();
@@ -29,15 +31,18 @@ void timeTask(void *pvParameters){
     }
 }
 
-void parametersTask(void *pvParameters){
+// Calculate parameters and refresh them on screen
+void parametersTask(void *pvParameters)
+{
   for(;;){
     update_parameters();
     refresh_parameters();
     vTaskDelay(dt / portTICK_PERIOD_MS); 
   }
 }
-// --- Setup ---
-void setup() {
+
+void setup() 
+{
     Serial.begin(115200);
 
     // Screen Init
@@ -47,7 +52,7 @@ void setup() {
     // BLE Init
     ble_init();
 
-    // Taski
+    // Tasks
     // Core0 - BLE
     xTaskCreate(bleTask,  "bleTask",  4096, NULL, 1, NULL);
     
@@ -57,6 +62,5 @@ void setup() {
     xTaskCreate(parametersTask, "parametersTask", 4096, NULL, 4, NULL);
 }
 
-// --- Loop ---
-void loop() {
-}
+// Loop is not used
+void loop() {}

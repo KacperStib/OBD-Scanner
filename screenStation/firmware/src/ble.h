@@ -6,10 +6,10 @@
 #include <BLEClient.h>
 #include <BLEAdvertisedDevice.h>
 
-// --- Ustawienia serwera ---
+// Server definitions
 #define TARGET_NAME "BLE-Server"
-#define SERVICE_UUID        "0BD2" // UUID Twojego serwisu
-#define CHARACTERISTIC_UUID "C0DE" // UUID charakterystyki do odczytu
+#define SERVICE_UUID        "0BD2" // UUID servis
+#define CHARACTERISTIC_UUID "C0DE" // UUID char to read
 
 extern BLEAdvertisedDevice* myDevice;
 extern BLEClient* pClient;
@@ -25,8 +25,8 @@ static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, ui
 bool connectToServer();
 void ble_check_connection();
 
-// --- Klasy callbacków ---
-// --- Callback klienta ---
+// Callback classes
+// Client callback
 class MyClientCallback : public BLEClientCallbacks {
 public:
     void onConnect(BLEClient* pclient) override {
@@ -40,7 +40,7 @@ public:
     }
 };
 
-// --- Callback skanera ---
+// Scaner callback
 class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
 public: 
     void onResult(BLEAdvertisedDevice advertisedDevice) override {

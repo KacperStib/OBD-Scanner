@@ -29,8 +29,6 @@ uint16_t MAF = 0;
 uint16_t test_RPM = 1800;
 uint16_t test_MAF = 50;
 
-bool mozna = true;
-
 void obd_task(){
 	// Initialize CANbus
 	CAN_init();

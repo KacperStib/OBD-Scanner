@@ -3,3 +3,4 @@ ui.c
 ui_comp_hook.c
 ui_helpers.c
 ui_events.c
+ui_img_ble_png.c
