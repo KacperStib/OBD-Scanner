@@ -48,17 +48,12 @@ void setup()
     // Screen Init
     init_tft();
     init_lvgl();
+    xTaskCreate(lvglTask, "lvglTask", 4096, NULL, 2, NULL);
+    xTaskCreate(timeTask, "timeTask", 4096, NULL, 3, NULL);
     
     // BLE Init
     ble_init();
-
-    // Tasks
-    // Core0 - BLE
     xTaskCreate(bleTask,  "bleTask",  4096, NULL, 1, NULL);
-    
-    // Core1 - Logic
-    xTaskCreate(lvglTask, "lvglTask", 4096, NULL, 2, NULL);
-    xTaskCreate(timeTask, "timeTask", 4096, NULL, 3, NULL);
     xTaskCreate(parametersTask, "parametersTask", 4096, NULL, 4, NULL);
 }
 
