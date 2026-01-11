@@ -24,6 +24,8 @@ extern lv_obj_t * ui_Fuel;
 extern lv_obj_t * ui_Consump;
 extern lv_obj_t * ui_Date;
 extern lv_obj_t * ui_Reset;
+extern lv_obj_t * ui_RPM;
+extern lv_obj_t * ui_Image1;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus
