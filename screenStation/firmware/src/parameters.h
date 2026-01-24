@@ -5,6 +5,7 @@ extern uint8_t speed;
 extern uint16_t RPM;
 extern uint16_t MAF;
 
+extern float fuel_lph;
 extern float fuel_consumption;
 extern float fuel_consumption_avg;
 extern float distance;

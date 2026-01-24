@@ -95,7 +95,16 @@ void refresh_parameters()
     sprintf(text_buf, "%d obr/min", RPM);
     lv_label_set_text(ui_RPM, text_buf);
 
-    sprintf(text_buf, "%.2f l/100km", fuel_consumption);
+    // While driving
+    if (speed > 1)
+    {
+        sprintf(text_buf, "%.2f l/100km", fuel_consumption);
+    }
+    // On stop
+    else
+    {
+        sprintf(text_buf, "%.2f l/h", fuel_lph);
+    }
     lv_label_set_text(ui_Consump, text_buf);
 
     sprintf(text_buf, "%.2f l/100km", fuel_consumption_avg);

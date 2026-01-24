@@ -22,12 +22,14 @@
 //static const char TAG[] = "main";
 // 1 byte - velocity, 2 byte - RPM, 2 byte - MAF
 uint8_t can_buf[5] = {0};
+
+uint8_t test_velocity = 120;
+uint16_t test_RPM = 1800;
+uint16_t test_MAF = 50;
+
 uint8_t velocity = 0;
 uint16_t RPM = 0;
 uint16_t MAF = 0;
-
-uint16_t test_RPM = 1800;
-uint16_t test_MAF = 50;
 
 bool can_ok = false;
 bool maf_available = false;
